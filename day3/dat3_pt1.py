@@ -4,95 +4,92 @@ with open('day3/input.txt', 'r') as file:
     for line in file_lines:
         schematic.append(line.replace('\n', ''))
 
-def find_part_num(x, y):
-    part_nums = []
+len_schematic_row = len(schematic[0])
+len_schematic_col = len(schematic)
+
+def has_symbol_adjacent(x, y):
     # top_left
-    try:
-        int(schematic[x-1][y-1])
-        return (x-1, y-1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
-    # top
-    try:
-        int(schematic[x-1][y])
-        return (x-1,y)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
-    # top_right
-    try:
-        int(schematic[x-1][y+1])
-        return (x-1,y+1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
+    if x > 0:
+        if y > 0:
+            test_value = schematic[x-1][y-1]
+            if test_value != '.' and not test_value.isdigit():
+                return True
+        # top
+        test_value = schematic[x-1][y]
+        if test_value != '.' and not test_value.isdigit():
+            return True
+
+        # top_right
+        if y < len_schematic_row-1:
+            test_value = schematic[x-1][y+1]
+            if test_value != '.' and not test_value.isdigit():
+                return True
     # left
-    try:
-        int(schematic[x][y-1])
-        return (x,y-1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
+    if y > 0:
+        test_value = schematic[x][y-1]
+        if test_value != '.' and not test_value.isdigit():
+            return True
+
     # right
-    try:
-        int(schematic[x][y+1])
-        return (x,y+1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
+    if y < len_schematic_row-1:
+        test_value = schematic[x][y+1]
+        if test_value != '.' and not test_value.isdigit():
+            return True
     # bottom_left
-    try:
-        int(schematic[x+1][y-1])
-        return (x+1,y-1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
-    # bottom
-    try:
-        int(schematic[x+1][y])
-        return (x+1,y)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
-    # bottom_right
-    try:
-        int(schematic[x+1][y+1])
-        return (x+1,y+1)
-    except:
-        print('either that index doesnt work, or inting the character didnt work')
+    if x < len_schematic_col - 1:
+        if y > 0:
+            test_value = schematic[x+1][y-1]
+            if test_value != '.' and not test_value.isdigit():
+                return True
+        # bottom
+        test_value = schematic[x+1][y]
+        if test_value != '.' and not test_value.isdigit():
+            return True
+        # bottom_right
+        if y < len_schematic_row-1:
+            test_value = schematic[x+1][y+1]
+            if test_value != '.' and not test_value.isdigit():
+                return True
+
+    return False
 
 
 
-def get_sum_part_nums(schematic):
-    part_positions = []
+def get_part_num_locations(schematic):
+    sum_part_nums = 0
     for xidx, x in enumerate(schematic):
+        currently_in_number = False
+        current_num_has_symbol = False
+        current_num_in = ''
         for yidx, y in enumerate(x):
-            if y == '.':
-                continue
+            if yidx == len(x)-4:
+                print('here')
+            if y.isdigit():
+                currently_in_number = True
+                current_num_in += y
+                if not current_num_has_symbol:
+                    if has_symbol_adjacent(xidx, yidx):
+                        current_num_has_symbol = True
+                if yidx == len(x) - 1:
+                    if current_num_has_symbol:
+                        sum_part_nums += int(current_num_in)
             else:
-                try:
-                    int(y)
-                    continue
-                except:
-                    part_num_location = find_part_num(xidx, yidx)
-                    print(part_num_location)
-    
+                if currently_in_number:
+                    if current_num_has_symbol:
+                        sum_part_nums += int(current_num_in)
+                currently_in_number = False
+                current_num_in = ''
+                current_num_has_symbol = False
+                continue
 
-def get_full_num(x, y):
-    num_str = schematic[x][y]
-    for char in schematic[x][y+1:]:
-        try:
-            int(char)
-            num_str += char
-        except:
-            break
-    for char in schematic[x][:y].reverse():
-        try:
-            int(char)
-            num_str = char + num_str
-        except:
-            break
-    print(num_str)
-    return int(num_str)
+    return sum_part_nums
+
+    
 
 
 
     
-print(get_sum_part_nums(schematic))
+print(get_part_num_locations(schematic))
 
 # for part_position in part_positions:
 #     x = part_position[0]
